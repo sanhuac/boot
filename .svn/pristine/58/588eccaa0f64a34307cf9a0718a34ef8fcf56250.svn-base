@@ -1,0 +1,223 @@
+package com.byc.merchants.merchants_cms.dao.store;
+
+import com.byc.merchants.merchants_cms.bean.store.*;
+import com.byc.merchants.merchants_cms.qo.IncomeQueryObject;
+import com.byc.merchants.merchants_cms.qo.WithdrawQueryObject;
+import com.byc.merchants.merchants_cms.util.ValidatorUtils;
+import org.apache.ibatis.annotations.*;
+
+import java.util.List;
+
+/**
+ * created by pht on 2018/9/12 0012
+ */
+public interface AccountMapper {
+    /**
+     * 查询总数
+     *
+     * @param mer_id
+     * @param qo
+     * @return
+     */
+
+    @SelectProvider(type = AccountSql.class, method = "queryCount")
+    int queryForCount(Integer mer_id, IncomeQueryObject qo);
+
+    /**
+     * 查询列表
+     *
+     * @param mer_id
+     * @param qo
+     * @return
+     */
+    @SelectProvider(type = AccountSql.class, method = "queryList")
+    List<Income> queryForList(Integer mer_id, IncomeQueryObject qo);
+
+    /**
+     * 查询总收入
+     *
+     * @param mer_id
+     * @return
+     */
+    @Select("SELECT total_income FROM mer_account WHERE mer_id = #{mer_id}")
+    double selectTotalIncome(Integer mer_id);
+
+    /**
+     * 查询商户账户
+     *
+     * @param mer_id
+     * @return
+     */
+    @Select("SELECT * FROM mer_account WHERE mer_id = #{mer_id}")
+    MerAccount selectAccountByMerId(Integer mer_id);
+
+    /**
+     * 更新账户可用余额
+     *
+     * @param mer_id
+     * @param usable_balance
+     * @param frozen_amount
+     * @return
+     */
+    @Update("UPDATE mer_account SET usable_balance = #{usable_balance},frozen_amount = #{frozen_amount} WHERE mer_id = #{mer_id}")
+    int updateUsableBalance(@Param("mer_id") Integer mer_id, @Param("usable_balance") Double usable_balance, @Param("frozen_amount") Double frozen_amount);
+
+    /**
+     * 查询订单号
+     *
+     * @param orderNo
+     * @return
+     */
+    @Select("SELECT count(0) FROM mer_withdraw WHERE withdraw_no = #{orderNo}")
+    int selectLogNumberByRequestNo(String orderNo);
+
+    /**
+     * 添加提现记录
+     *
+     * @param withdraw
+     * @return
+     */
+    @Insert("INSERT INTO mer_withdraw (withdraw_no, mer_id, withdraw_amount, receipt_type, receipt_account, apply_time) " +
+            "VALUES (#{withdraw_no},#{mer_id},#{withdraw_amount},#{receipt_type},#{receipt_account},#{apply_time})")
+    int insertWithdrawNote(Withdraw withdraw);
+
+    /**
+     * 增加商户资金流水
+     *
+     * @param accountLog
+     * @return
+     */
+    @Insert("INSERT INTO mer_account_log (mer_id, amount, create_time, remark, trade_no) " +
+            "VALUES(#{mer_id},#{amount},#{create_time},#{remark},#{trade_no}) ")
+    int insertAccountLog(MerAccountLog accountLog);
+
+    /**
+     * 查询提现记录的条数
+     *
+     * @param mer_id
+     * @param qo
+     * @return
+     */
+    @SelectProvider(type = AccountSql.class, method = "queryWithdrawCount")
+    int queryForWithdrawCount(Integer mer_id, WithdrawQueryObject qo);
+
+    /**
+     * 查询提现记录的列表
+     *
+     * @param mer_id
+     * @param qo
+     * @return
+     */
+    @SelectProvider(type = AccountSql.class, method = "queryWithdrawList")
+    List<Withdraw> queryForWithdrawList(Integer mer_id, WithdrawQueryObject qo);
+
+    /**
+     * 获取保证金金额
+     *
+     * @param mer_id
+     * @return
+     */
+    @Select("SELECT pay_money FROM mer_deposit_log WHERE mer_id = #{mer_id}")
+    Double selectDepositByMerId(Integer mer_id);
+
+    /**
+     * 更新保证金金额
+     *
+     * @param mer_id
+     * @param deposit
+     * @return
+     */
+    @Update("UPDATE mer_deposit_log SET pay_money = #{deposit} WHERE mer_id = #{mer_id}")
+    int updateDeposit(@Param("mer_id") Integer mer_id, @Param("deposit") Double deposit);
+
+    /**
+     * 生成退款记录
+     *
+     * @param merRefund
+     * @return
+     */
+    @Insert("INSERT INTO mer_refund (refund_no, mer_id, refund_amount, receipt_type, receipt_account, apply_time) " +
+            "VALUES(#{refund_no},#{mer_id},#{refund_amount},#{receipt_type},#{receipt_account},#{apply_time})")
+    int insertRefundNote(MerRefund merRefund);
+
+    class AccountSql {
+        public String queryCount(Integer mer_id, IncomeQueryObject qo) {
+            String sql = "SELECT COUNT(0) FROM mer_earnest_order meo LEFT JOIN mer_car_info mci ON meo.car_id = mci.car_id " +
+                    " JOIN mer_store ms ON mci.mer_id = ms.mer_id WHERE ms.mer_id = " + mer_id + " AND pay_status = 2 ";
+            if (ValidatorUtils.isNotNull(qo.getStartTime())) {
+                sql += " AND pay_time >= " + qo.getStartTime();
+            }
+            if (ValidatorUtils.isNotNull(qo.getEndTime())) {
+                sql += " AND pay_time <= " + qo.getEndTime();
+            }
+            return sql;
+        }
+
+        public String queryList(Integer mer_id, IncomeQueryObject qo) {
+            String sql = "SELECT meo.*,mci.car_color,mci.car_name,mci.index_image,mci.mer_id " +
+                    " FROM mer_earnest_order meo LEFT JOIN mer_car_info mci ON meo.car_id = mci.car_id " +
+                    " JOIN mer_store ms ON mci.mer_id = ms.mer_id WHERE ms.mer_id = " + mer_id + " AND pay_status = 2 ";
+            if (ValidatorUtils.isNotNull(qo.getStartTime())) {
+                sql += " AND pay_time >= " + qo.getStartTime();
+            }
+            if (ValidatorUtils.isNotNull(qo.getEndTime())) {
+                sql += " AND pay_time <= " + qo.getEndTime();
+            }
+            sql += " limit " + qo.getStartIndex() + "," + qo.getPageSize();
+            return sql;
+        }
+
+
+        /**
+         * 提现记录总数
+         *
+         * @param mer_id
+         * @param qo
+         * @return
+         */
+        public String queryWithdrawCount(Integer mer_id, WithdrawQueryObject qo) {
+
+            String sql = "SELECT COUNT(0) FROM mer_withdraw mw LEFT JOIN mer_store ms ON mw.mer_id = ms.mer_id WHERE mw.mer_id = " + mer_id;
+            //动态sql拼装
+            if (ValidatorUtils.isNotNull(qo.getStartTime())) {
+                sql += " AND mw.apply_time >= " + qo.getStartTime();
+            }
+            if (ValidatorUtils.isNotNull(qo.getEndTime())) {
+                sql += " AND mw.apply_time <= " + qo.getEndTime();
+            }
+
+            if (ValidatorUtils.isNotNull(qo.getStatus())) {
+                sql += " AND mw.withdraw_status = " + qo.getStatus();
+            }
+            return sql;
+        }
+
+        /**
+         * 提现记录列表
+         *
+         * @param mer_id
+         * @param qo
+         * @return
+         */
+        public String queryWithdrawList(Integer mer_id, WithdrawQueryObject qo) {
+            String sql = "SELECT mw.*,ms.mer_name FROM mer_withdraw mw LEFT JOIN mer_store ms ON mw.mer_id = ms.mer_id WHERE mw.mer_id = " + mer_id;
+            //动态sql拼装
+            if (ValidatorUtils.isNotNull(qo.getStartTime())) {
+                sql += " AND mw.apply_time >= " + qo.getStartTime();
+            }
+            if (ValidatorUtils.isNotNull(qo.getEndTime())) {
+                sql += " AND mw.apply_time <= " + qo.getEndTime();
+            }
+
+            if (ValidatorUtils.isNotNull(qo.getStatus())) {
+                sql += " AND mw.withdraw_status = " + qo.getStatus();
+            }
+
+            sql += " limit " + qo.getStartIndex() + "," + qo.getPageSize();
+            return sql;
+
+        }
+
+
+    }
+}

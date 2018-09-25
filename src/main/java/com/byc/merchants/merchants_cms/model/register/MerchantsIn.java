@@ -1,0 +1,113 @@
+package com.byc.merchants.merchants_cms.model.register;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import java.io.Serializable;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/10 12:18
+ * @Description:
+ */
+@ApiModel(value = "商户开店所需参数", description = "商户开店所需参数")
+@Data
+public class MerchantsIn implements Serializable {
+
+    /**
+     * 商户id
+     */
+    private Integer mer_id;
+
+    /**
+     * 店铺类型
+     */
+    @ApiModelProperty(value = "店铺类型[0:4s店 1:车行]", name = "store_type", example = "0")
+    private Integer store_type;
+
+    /**
+     * 商户门店名称
+     */
+    @ApiModelProperty(value = "商户门店名称", name = "store_name", example = "大众4s店")
+    private String store_name;
+
+    /**
+     * 法人姓名
+     */
+    @ApiModelProperty(value = "法人姓名", name = "mer_name", example = "张三")
+    private String mer_name;
+
+    /**
+     * 客服电话
+     */
+    @ApiModelProperty(value = "客服电话", name = "customer_photo", example = "0571-8888888")
+    private String customer_photo;
+
+    /**
+     * 门店地址
+     */
+    @ApiModelProperty(value = "门店地址", name = "store_address", example = "浙江省杭州市下城区石桥路729号")
+    private String store_address;
+
+    /**
+     * 纬度
+     */
+    @ApiModelProperty(value = "纬度", name = "lat", example = "23.000000")
+    private String lat;
+
+    /**
+     * 经度
+     */
+    @ApiModelProperty(value = "经度", name = "lng", example = "126.000000")
+    private String lng;
+
+    /**
+     * 省编码
+     */
+    @ApiModelProperty(value = "省编码", name = "province_code", example = "330000")
+    private String province_code;
+
+    /**
+     * 市编码
+     */
+    @ApiModelProperty(value = "市编码", name = "city_code", example = "330100")
+    private String city_code;
+
+    /**
+     * 区编码
+     */
+    @ApiModelProperty(value = "区编码", name = "area_code", example = "330103")
+    private String area_code;
+
+    /**
+     * 身份证正面照
+     */
+    @ApiModelProperty(value = "身份证正面照", name = "card_face", example = "images/school/1534236090914.jpg")
+    private String card_face;
+
+    /**
+     * 身份证反面照
+     */
+    @ApiModelProperty(value = "身份证反面照", name = "card_side", example = "images/school/1534236090914.jpg")
+    private String card_side;
+
+    /**
+     * 营业执照
+     */
+    @ApiModelProperty(value = "营业执照", name = "business_license", example = "images/school/1534236090914.jpg")
+    private String business_license;
+
+    /**
+     * 承若书
+     */
+    @ApiModelProperty(value = "承若书", name = "commitment_book", example = "images/school/1534236090914.jpg")
+    private String commitment_book;
+
+    /**
+     * 店铺logo
+     */
+    @ApiModelProperty(hidden = true)
+    private String store_logo;
+
+}

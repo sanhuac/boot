@@ -1,0 +1,28 @@
+package com.byc.merchants.merchants_cms.bean;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import java.io.Serializable;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/5 10:49
+ * @Description:
+ */
+@Data
+public class User implements Serializable{
+
+    /**
+     * 主键id
+     */
+    private Integer id;
+
+    /**
+     * 商户用户名字
+     */
+    private String user_name;
+
+
+}

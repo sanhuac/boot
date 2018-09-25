@@ -1,0 +1,21 @@
+package com.byc.merchants.merchants_cms.service;
+
+import com.byc.merchants.merchants_cms.model.UserModel;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/5 12:22
+ * @Description: 商户接口
+ */
+public interface UserService {
+
+    /**
+     *@描述 根据商户id查询商户
+     *@参数  mer_id
+     *@返回值  UserModel
+     *@创建人  胡丛
+     *@创建时间  2018/9/5
+     *@修改人和其它信息
+     */
+    UserModel selectUserById(Integer mer_id);
+}

@@ -1,0 +1,167 @@
+package com.byc.merchants.merchants_cms.dao.user;
+
+import com.byc.merchants.merchants_cms.bean.user.User;
+import com.byc.merchants.merchants_cms.model.register.MerchantsIn;
+import com.byc.merchants.merchants_cms.model.user.UserModel;
+import com.byc.merchants.merchants_cms.model.login.LoginModel;
+import com.byc.merchants.merchants_cms.model.login.LoginToken;
+import com.byc.merchants.merchants_cms.model.user.LoginLog;
+import org.apache.ibatis.annotations.*;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/5 12:22
+ * @Description: 商户接口
+ */
+public interface UserMapper {
+
+    /**
+     * @描述 根据商户id查询商户信息
+     * @参数 mer_id
+     * @返回值 UserModel
+     * @创建人 胡丛
+     * @创建时间 2018/9/5
+     * @修改人和其它信息
+     */
+    @Select("SELECT id,mer_name FROM mer_user WHERE id = #{mer_id}")
+    UserModel selectUserById(Integer mer_id);
+
+
+    /**
+     * 通过电话号码查询用户数量
+     *
+     * @param mobile
+     * @return
+     */
+    @Select("SELECT count(0) FROM mer_store WHERE mer_mobile = #{mobile}")
+    int selectNumByMobile(String mobile);
+
+
+    /**
+     * 登录通过手机号查询用户基本信息
+     *
+     * @param mer_mobile
+     * @return
+     */
+    @Select("SELECT mer_id,mer_name,mer_mobile,password,mer_status FROM mer_store WHERE mer_mobile = #{mer_mobile}")
+    LoginModel selectMerByMerMobile(String mer_mobile);
+
+    /**
+     * 查询token
+     *
+     * @param mer_id
+     * @return
+     */
+    @Select("SELECT * FROM mer_login_token WHERE mer_id = #{mer_id}")
+    LoginToken selectUserTokenByMerId(Integer mer_id);
+
+    /**
+     * 删除token
+     *
+     * @param mer_id
+     */
+    @Delete("DELETE FROM mer_login_token WHERE mer_id = #{mer_id}")
+    void deleteUserTokenByMerId(Integer mer_id);
+
+    /**
+     * 添加token
+     *
+     * @param token
+     * @return
+     */
+    @Insert("INSERT INTO mer_login_token (access_id, mer_id, login_time, last_action_time, expire_time) " +
+            "VALUES(#{access_id},#{mer_id},#{login_time},#{last_action_time},#{expire_time}) ")
+    int addLoginToken(LoginToken token);
+
+
+    /**
+     * @描述 初步注册
+     * @参数 User
+     * @返回值 int
+     * @创建人 胡丛
+     * @创建时间 2018/9/10
+     * @修改人和其它信息
+     */
+    @Insert("INSERT INTO mer_store(mer_mobile,password,create_time)VALUES(#{merMobile},#{password},UNIX_TIMESTAMP())")
+    @Options(useGeneratedKeys = true, keyProperty = "merId", keyColumn = "mer_id")
+    @Results({
+            @Result(property = "merMobile", column = "mer_mobile"),
+            @Result(property = "password", column = "password")
+    })
+    int register(User user);
+
+    /**
+     * 添加登录日志
+     *
+     * @param loginLog
+     */
+    @Insert("INSERT INTO mer_login_log (log_id, mer_id, mer_mobile, login_time, login_ip, login_area_code,longitude,latitude) " +
+            "VALUES (#{log_id},#{mer_id},#{mer_mobile},#{login_time},#{login_ip},#{login_area_code},#{longitude},#{latitude})")
+    void addLoginLog(LoginLog loginLog);
+
+    /**
+     * @描述 商户入驻开店
+     * @参数 MerchantsIn
+     * @返回值 int
+     * @创建人 胡丛
+     * @创建时间 2018/9/10
+     * @修改人和其它信息
+     */
+    @Update("UPDATE mer_store SET store_type=#{store_type},store_name=#{store_name},mer_name=#{mer_name},customer_photo=#{customer_photo},store_address=#{store_address}," +
+            "lat=#{lat},lng=#{lng},province_code=#{province_code},city_code=#{city_code},area_code=#{area_code},card_face=#{card_face},card_side=#{card_side}," +
+            "business_license=#{business_license},commitment_book=#{commitment_book} WHERE mer_id = #{mer_id}")
+    int merchantsIn(MerchantsIn merchantsIn);
+
+    /**
+     * @描述 根据商户id查询商户信息
+     * @参数 mer_id
+     * @返回值 MerchantsIn
+     * @创建人 胡丛
+     * @创建时间 2018/9/10
+     * @修改人和其它信息
+     */
+    @Select("SELECT store_type,store_logo,store_name,mer_name,customer_photo,store_address,lat,lng,province_code,city_code,area_code," +
+            "card_face,card_side,business_license,commitment_book  FROM mer_store WHERE mer_id = #{mer_id} AND mer_status = 0")
+    MerchantsIn selectMerById(Integer mer_id);
+
+    /**
+     * 获取token
+     *
+     * @param accessToken
+     * @return
+     */
+    @Select("SELECT * FROM mer_login_token WHERE access_id = #{accessToken}")
+    LoginToken selectUserTokenByAccessId(String accessToken);
+
+    /**
+     * @描述 查询商铺进一步信息
+     * @参数 mer_id
+     * @返回值 UserModel
+     * @创建人 胡丛
+     * @创建时间 2018/9/10
+     * @修改人和其它信息
+     */
+    @Select("SELECT store_logo,store_name,store_introduction,customer_photo,store_address,sale_brands,favor_label,notice_label,store_ercode FROM mer_store WHERE mer_id = #{mer_id}")
+    UserModel selectStoreById(Integer mer_id);
+
+
+    /**
+     * 修改密码
+     *
+     * @param mer_id
+     * @param password
+     * @return
+     */
+    @Update("UPDATE mer_store SET password = #{password} WHERE mer_id = #{mer_id}")
+    int updatePasswordById(@Param("mer_id") Integer mer_id, @Param("password") String password);
+
+
+    /**
+     * 根据电话号码查询商铺类型
+     * @param mer_id
+     * @param password
+     * @return
+     */
+    @Select("select store_type from mer_store where mer_mobile = #{mer_mobile}")
+    Integer selectStoreType(String mer_mobile);
+}

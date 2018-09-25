@@ -1,0 +1,21 @@
+package com.byc.merchants.merchants_cms.controller.test;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/5 13:44
+ * @Description:
+ */
+@RestController
+@RequestMapping("/test")
+public class TestController {
+
+
+    @RequestMapping("/redis")
+    public String test(){
+
+        return "REDIS";
+    }
+}

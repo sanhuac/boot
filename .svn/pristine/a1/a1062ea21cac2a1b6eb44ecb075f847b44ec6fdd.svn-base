@@ -1,0 +1,309 @@
+package com.byc.merchants.merchants_cms.util;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+
+public class ValidatorUtils {
+
+
+    public static boolean isEmpty(String str) {
+
+        return ((str == null) || (str.trim().length() == 0));
+    }
+
+    public static boolean isNotEmpty(String str) {
+        if (str == null) {
+            return false;
+        }
+
+        return ((str != null) && (str.trim().length() > 0) && !"null".equals(str.trim()));
+    }
+
+    public static boolean isNotEmpty(@SuppressWarnings("rawtypes") Map result) {
+        if (result != null && !result.isEmpty() && result.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isEmpty(@SuppressWarnings("rawtypes") Map result) {
+        return !isNotEmpty(result);
+    }
+
+    public static boolean isNotEmpty(@SuppressWarnings("rawtypes") List result) {
+        if (result != null && !result.isEmpty() && result.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isEmpty(@SuppressWarnings("rawtypes") List result) {
+        return !isNotEmpty(result);
+    }
+
+    public static boolean isNotEmpty(@SuppressWarnings("rawtypes") Set result) {
+        if (result != null && !result.isEmpty() && result.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isEmpty(@SuppressWarnings("rawtypes") Set result) {
+        return !isNotEmpty(result);
+    }
+
+    public static boolean isNotNull(String str) {
+        if (str == null) {
+            return false;
+        }
+        return ((str != null) && (str.trim().length() > 0) && !"null"
+                .equals(str.trim()));
+    }
+
+    public static boolean isNotNull(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        return isNotNull(obj + "");
+    }
+
+    public static boolean isNull(Object obj) {
+        return !isNotNull(obj);
+    }
+
+    public static boolean isNull(String str) {
+        return !isNotNull(str);
+    }
+
+    public static boolean isNotNull(Integer str) {
+        if (str == null) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isNull(Integer str) {
+        return !isNotNull(str);
+    }
+
+    public static boolean isNotNull(Long str) {
+        if (str == null) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isNull(Long str) {
+        return !isNotNull(str);
+    }
+
+    public static boolean isNotNull(Date str) {
+        if (str == null) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isNull(Date str) {
+        return !isNotNull(str);
+    }
+
+
+    public static boolean isBlank(String str) {
+
+        int length = 0;
+
+        if ((str == null) || ((length = str.length()) == 0)) {
+            return true;
+        }
+
+        for (int i = 0; i < length; i++) {
+            if (Character.isWhitespace(str.charAt(i))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean checkString(String str, String regex) {
+
+        return str.matches(regex);
+    }
+
+    public static boolean isMd5(String md5) {
+
+        if (md5.length() != 32) {
+            return false;
+        }
+
+        return checkString(md5, "[0-9A-Fa-f]+");
+    }
+
+    public static boolean isLoginMobile(String code) {
+        code = StringUtils.nullToStrTrim(code);
+        if (isNull(code)) {
+            return false;
+        }
+        if (code.length() != 11) {
+            return false;
+        }
+        String regex = "^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\\d{8}$";
+
+        boolean flg = code.matches(regex);
+        if (!flg) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isPassword(String password) {
+        password = StringUtils.nullToStrTrim(password);
+        if (password.length() < 6 || password.length() > 20) {
+            return false;
+        }
+        return true;
+    }
+
+    public static String nullToStrTrim(String str) {
+        if (str == null) {
+            str = "";
+        }
+        return str.trim();
+    }
+
+    public static boolean isInfoCode(String code) {
+
+        code = nullToStrTrim(code);
+        if (code.length() != 6) {
+            return false;
+        }
+
+        String regex = "^([1-9])\\d{5}$";
+
+        return code.matches(regex);
+    }
+
+    /**
+     * 校验身份证长度
+     *
+     * @param cardNo
+     * @return
+     * @author lgh
+     */
+    public static boolean isCardNoLength(String cardNo) {
+
+        cardNo = nullToStrTrim(cardNo);
+        cardNo = cardNo.replaceAll(" ", "");
+        if (cardNo.length() == 15 || cardNo.length() == 18) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 判断是否是姓名
+     *
+     * @param name
+     * @return
+     * @author lgh
+     */
+    public static boolean isRealName(String name) {
+
+        name = nullToStrTrim(name);
+        name = name.replaceAll(" ", "");
+        String regex = "^[\u4e00-\u9fa5]{2,20}$";
+        return name.matches(regex);
+    }
+
+    /**
+     * 手机号脱敏（例：18245671234 脱敏后返回 182****1234）
+     *
+     * @param code
+     * @return
+     * @author lgh
+     */
+    public static String mobileEncrypt(String mobilePhone) {
+
+        if (isEmpty(mobilePhone) || mobilePhone.length() != 11) {
+            return mobilePhone;
+        }
+
+        mobilePhone = nullToStrTrim(mobilePhone);
+        return mobilePhone.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
+    }
+
+    /**
+     * 验证码校验（四位且纯数字）
+     *
+     * @param code
+     * @return
+     * @author lgh
+     */
+    public static boolean isFourValidCode(String code) {
+
+        code = nullToStrTrim(code);
+        String regex = "^\\d{4}$";
+        return code.matches(regex);
+    }
+
+    /**
+     * 身份证脱敏
+     *
+     * @param cardNo
+     * @return
+     * @author lgh
+     */
+    public static String encryptCardNo(String cardNo) {
+
+        cardNo = nullToStrTrim(cardNo);
+
+        if (cardNo.length() == 15) {
+            return cardNo.substring(0, 6) + "****" + cardNo.substring(8);
+        }
+
+        if (cardNo.length() == 18) {
+            return cardNo.substring(0, 6) + "****" + cardNo.substring(10);
+        }
+
+        return cardNo;
+    }
+
+    /**
+     * 根据身份证判断性别
+     *
+     * @param cardNo
+     * @return
+     * @author lgh
+     */
+    public static String getSexByCardNo(String cardNo) {
+
+        cardNo = nullToStrTrim(cardNo);
+
+        if (cardNo.length() == 15) {
+            return Integer.parseInt(cardNo.substring(14)) % 2 != 0 ? "男" : "女";
+        }
+
+        if (cardNo.length() == 18) {
+            return Integer.parseInt(cardNo.substring(16, 17)) % 2 != 0 ? "男" : "女";
+        }
+
+        return "无法识别";
+    }
+
+
+
+
+
+
+
+
+
+    public static void main(String[] args) {
+        String a = "";
+        System.out.println(isNotEmpty(a));
+    }
+
+}

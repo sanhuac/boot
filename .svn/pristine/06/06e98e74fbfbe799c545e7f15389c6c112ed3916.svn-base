@@ -1,0 +1,14 @@
+package com.byc.merchants.merchants_cms.service.apply;
+
+import com.byc.merchants.merchants_cms.exception.UnifiedException;
+import com.byc.merchants.merchants_cms.qo.ApplyQueryObject;
+import com.byc.merchants.merchants_cms.qo.PageResult;
+
+/**
+ * created by pht on 2018/9/17 0017
+ */
+public interface ApplyService {
+
+    PageResult subscribeList(Integer mer_id, ApplyQueryObject qo) throws UnifiedException;
+
+}

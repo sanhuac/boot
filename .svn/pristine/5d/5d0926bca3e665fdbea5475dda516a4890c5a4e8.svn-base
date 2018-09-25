@@ -1,0 +1,15 @@
+package com.byc.merchants.merchants_cms;
+
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+@SpringBootApplication
+@MapperScan("com.byc.merchants.merchants_cms.dao")
+public class MerchantsCmsApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(MerchantsCmsApplication.class, args);
+	}
+}

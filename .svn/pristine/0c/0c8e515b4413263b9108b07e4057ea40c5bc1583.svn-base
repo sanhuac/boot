@@ -1,0 +1,74 @@
+package com.byc.merchants.merchants_cms.interceptor;
+
+/**
+ * created by pht on 2018/9/7 0007
+ */
+
+import com.byc.merchants.merchants_cms.handler.CurrentUserMethodArgumentResolver;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+
+import java.util.List;
+
+/**
+ * 拦截器管理
+ *
+ * @author pht
+ * @program merchants_cms
+ * @date 2018/9/7 0007
+ */
+@Configuration
+public class WebMvcConfigurer extends WebMvcConfigurationSupport {
+
+    @Override
+    protected void addInterceptors(InterceptorRegistry registry) {
+        //注册拦截器
+        InterceptorRegistration login = registry.addInterceptor(loginIntercetor());
+        //添加拦截路径(拦截所有)
+        login.addPathPatterns("/**");
+        //排除拦截路径
+        login.excludePathPatterns("/*/login", "/*/logout");
+
+        super.addInterceptors(registry);
+    }
+
+    @Override
+    protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("swagger-ui.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+        super.addResourceHandlers(registry);
+    }
+
+    @Bean
+    public LoginIntercetor loginIntercetor() {
+        return new LoginIntercetor();
+    }
+
+    /**
+     * 注入bean
+     * @return
+     */
+    @Bean
+    public CurrentUserMethodArgumentResolver currentUserMethodArgumentResolver(){
+        return new CurrentUserMethodArgumentResolver();
+    }
+
+    /**
+     * 添加处理器
+     * @param argumentResolvers
+     */
+    @Override
+    protected void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+        argumentResolvers.add(new CurrentUserMethodArgumentResolver());
+    }
+
+
+}

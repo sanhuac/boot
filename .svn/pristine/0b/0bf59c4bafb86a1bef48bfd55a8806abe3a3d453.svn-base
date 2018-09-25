@@ -1,0 +1,51 @@
+package com.byc.merchants.merchants_cms.interceptor;
+
+/**
+ * created by pht on 2018/9/7 0007
+ */
+
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.lang.invoke.MethodHandle;
+
+/**
+ * 登录拦截器
+ * @program merchants_cms
+ * @date 2018/9/7 0007
+ * @author pht
+ */
+public class LoginIntercetor implements HandlerInterceptor {
+
+
+
+    /**
+     * 拦截之前
+     * @param request 请求
+     * @param response 响应
+     * @param handler 被映射的对象
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        //判断是否映射到方法上
+        if (!(handler instanceof MethodHandle)){
+            //直接放行
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
+
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
+
+    }
+}

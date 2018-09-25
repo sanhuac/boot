@@ -1,0 +1,89 @@
+package com.byc.merchants.merchants_cms.dao.news;
+
+import com.byc.merchants.merchants_cms.bean.news.News;
+import com.byc.merchants.merchants_cms.qo.NewsQueryObject;
+import com.byc.merchants.merchants_cms.util.ValidatorUtils;
+import org.apache.ibatis.annotations.*;
+
+import java.util.List;
+
+/**
+ * created by pht on 2018/9/11 0011
+ */
+public interface NewsMapper {
+
+    /**
+     * 查询数量
+     *
+     * @param mer_id
+     * @param qo
+     * @return
+     */
+    @SelectProvider(type = NewsQuery.class, method = "queryCount")
+    int queryForCount(Integer mer_id, NewsQueryObject qo);
+
+    /**
+     * 查询列表
+     *
+     * @param mer_id
+     * @param qo
+     * @return
+     */
+    @SelectProvider(type = NewsQuery.class, method = "queryList")
+    List<News> queryForList(Integer mer_id, NewsQueryObject qo);
+
+    /**
+     * 根据id查看
+     *
+     * @param news_id
+     * @return
+     */
+    @Select("SELECT * FROM mer_news WHERE news_id = #{news_id}")
+    News selectNewsById(Integer news_id);
+
+    /**
+     * 添加新闻
+     *
+     * @param news
+     */
+    @Insert("INSERT INTO mer_news (news_no, news_title, second_title, news_content, mer_id, create_time, image) " +
+            "VALUES (#{news_no},#{news_title},#{second_title},#{news_content},#{mer_id},#{create_time},#{image})")
+    void insertNews(News news);
+
+    /**
+     * 编辑新闻
+     *
+     * @param news
+     */
+    @Update("UPDATE mer_news SET news_title = #{news_title},second_title = #{second_title},news_content = #{news_content},image = #{image} WHERE news_id = #{news_id}")
+    void updateNews(News news);
+
+    /**
+     * 删除新闻
+     *
+     * @param mer_id
+     * @param news_id
+     */
+    @Delete("DELETE FROM mer_news WHERE news_id = #{news_id} AND mer_id = #{mer_id}")
+    void delete(@Param("mer_id") Integer mer_id, @Param("news_id") Integer news_id);
+
+    class NewsQuery {
+        public String queryCount(Integer mer_id, NewsQueryObject qo) {
+            String sql = "SELECT count(0) FROM mer_news WHERE mer_id = " + mer_id;
+            if (ValidatorUtils.isNotNull(qo.getKeyword())) {
+                sql += " AND news_title like concat('%','" + qo.getKeyword() + "','%')";
+            }
+            return sql;
+        }
+
+        public String queryList(Integer mer_id, NewsQueryObject qo) {
+            String sql = "select n.*,u.name from mer_news n left join sys_admin u on n.admin_id = u.id WHERE n.mer_id = " + mer_id;
+            if (ValidatorUtils.isNotNull(qo.getKeyword())) {
+                sql += " AND n.news_title like concat('%','" + qo.getKeyword() + "','%')";
+            }
+            sql += " limit " + qo.getStartIndex() + "," + qo.getPageSize();
+            return sql;
+        }
+
+    }
+}

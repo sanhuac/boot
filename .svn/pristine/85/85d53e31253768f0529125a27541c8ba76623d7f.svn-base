@@ -1,0 +1,144 @@
+package com.byc.merchants.merchants_cms.service.serviceImpl.user;
+
+import com.byc.merchants.merchants_cms.constant.UserConstant;
+import com.byc.merchants.merchants_cms.dao.UserMapper;
+import com.byc.merchants.merchants_cms.exception.UnifiedException;
+import com.byc.merchants.merchants_cms.model.UserModel;
+import com.byc.merchants.merchants_cms.model.login.LoginModel;
+import com.byc.merchants.merchants_cms.model.login.LoginToken;
+import com.byc.merchants.merchants_cms.redis.RedisKeyPrefix;
+import com.byc.merchants.merchants_cms.service.user.UserService;
+import com.byc.merchants.merchants_cms.service.redis.RedisService;
+import com.byc.merchants.merchants_cms.util.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/5 12:23
+ * @Description: 商户业务层
+ */
+@Service("userService")
+@Slf4j
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private UserMapper userDao;
+    @Autowired
+    private RedisService redisService;
+
+    /**
+     * @描述 根据商户id查询商户
+     * @参数 mer_id
+     * @返回值 UserModel
+     * @创建人 胡丛
+     * @创建时间 2018/9/5
+     * @修改人和其它信息
+     */
+    public UserModel selectUserById(Integer mer_id) {
+        UserModel userModel = userDao.selectUserById(mer_id);
+        return userModel;
+    }
+
+    /**
+     * 商户登录
+     *
+     * @param request
+     * @param mer_mobile 手机号
+     * @param password   密码
+     * @return
+     */
+    @Override
+    public Map<String, Object> login(HttpServletRequest request, String mer_mobile, String password) throws UnifiedException {
+        //参数校验
+        if (!ValidatorUtils.isLoginMobile(mer_mobile)) {
+            throw new UnifiedException(200001);
+        }
+        //密码校验
+        password = UserUtils.checkPassword(password);
+        //根据手机号查询
+        LoginModel model = userDao.selectMerByMerMobile(mer_mobile);
+        if (ValidatorUtils.isNull(model)) {
+            throw new UnifiedException(200008);
+        }
+        //判断当前店铺是否开通
+        if (UserConstant.MER_STATUS_NO == model.getMer_status()) {
+            throw new UnifiedException(200009);
+        }
+        //密码加密对比校验
+        if (!model.getPassword().equals(MD5.md5(password))) {
+            throw new UnifiedException(200010);
+        }
+
+        //生成令牌信息
+        //通行证(令牌)id
+        String accessId = CommonUtils.getRandom(model.getMer_mobile());
+        //登陆时间
+        int loginTime = Integer.parseInt(TimeUtils.getCurrentTimeStamp() + "");
+        //存贮登录信息
+        addToken(accessId, model.getMer_id(), loginTime);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("userName", "xiaoming");
+        map.put("mer_id", "1");
+        return map;
+    }
+
+    /**
+     * 添加token
+     *
+     * @param accessId
+     * @param mer_id
+     * @param loginTime
+     */
+    private void addToken(String accessId, Integer mer_id, int loginTime) throws UnifiedException {
+        //先登出
+        logout(mer_id);
+        //重新封装token数据
+        LoginToken token = new LoginToken();
+        token.setAccess_id(accessId);
+        token.setMer_id(mer_id);
+        token.setLogin_time(loginTime);
+        token.setLast_action_time(Integer.parseInt(TimeUtils.getCurrentTimeStamp() + ""));
+        token.setExpire_time(loginTime + 30 * 60);
+        //存入数据库
+        int i = userDao.addLoginToken(token);
+        if (i != 1) {
+            throw new UnifiedException(200011);
+        }
+        //添加到redis队列中，并设置过期时间
+        Map<String, Object> tokenMap = new LinkedHashMap<>();
+        tokenMap.put("access_id", accessId);
+        tokenMap.put("mer_id", mer_id);
+        tokenMap.put("login_time", loginTime);
+        tokenMap.put("last_action_time", token.getLast_action_time());
+        //设置过期时间
+        redisService.set(RedisKeyPrefix.MER_TOKEN_PREFIX + accessId, tokenMap, 30 * 60);
+
+
+    }
+
+    /**
+     * 登出
+     *
+     * @param mer_id
+     */
+    private void logout(Integer mer_id) {
+        //查询数据库
+        LoginToken token = userDao.selectUserTokenByMerId(mer_id);
+        if (!ValidatorUtils.isNull(token)) {
+            //清除redis
+            redisService.deleteKey(RedisKeyPrefix.MER_TOKEN_PREFIX + token.getAccess_id());
+            //删除数据库
+            userDao.deleteUserTokenByMerId(mer_id);
+        }
+    }
+
+
+}

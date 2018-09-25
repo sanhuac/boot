@@ -1,0 +1,11 @@
+package com.byc.merchants.merchants_cms.controller;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/5 10:47
+ * @Description:
+ */
+public class BaseController {
+
+
+}

@@ -1,0 +1,102 @@
+package com.byc.merchants.merchants_cms.dao;
+
+<<<<<<< .mine
+import com.byc.merchants.merchants_cms.bean.user.User;
+import com.byc.merchants.merchants_cms.model.UserModel;
+=======
+import com.byc.merchants.merchants_cms.model.user.UserModel;
+>>>>>>> .r2272
+import com.byc.merchants.merchants_cms.model.login.LoginModel;
+import com.byc.merchants.merchants_cms.model.login.LoginToken;
+import com.byc.merchants.merchants_cms.model.user.LoginLog;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Select;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/5 12:22
+ * @Description: 商户接口
+ */
+public interface UserMapper {
+
+    /**
+     * @描述 根据商户id查询商户信息
+     * @参数 mer_id
+     * @返回值 UserModel
+     * @创建人 胡丛
+     * @创建时间 2018/9/5
+     * @修改人和其它信息
+     */
+    @Select("SELECT id,mer_name FROM mer_user WHERE id = #{mer_id}")
+    UserModel selectUserById(Integer mer_id);
+
+
+    /**
+     * 通过电话号码查询用户数量
+     *
+     * @param mobile
+     * @return
+     */
+    @Select("SELECT count(0) FROM mer_store WHERE mer_mobile = #{mobile}")
+    int selectNumByMobile(String mobile);
+
+
+    /**
+     * 登录通过手机号查询用户基本信息
+     *
+     * @param mer_mobile
+     * @return
+     */
+    @Select("SELECT mer_id,mer_name,mer_mobile,password,mer_status FROM mer_store WHERE mer_mobile = #{mer_mobile}")
+    LoginModel selectMerByMerMobile(String mer_mobile);
+
+    /**
+     * 查询token
+     *
+     * @param mer_id
+     * @return
+     */
+    @Select("SELECT * FROM mer_login_token WHERE mer_id = #{mer_id}")
+    LoginToken selectUserTokenByMerId(Integer mer_id);
+
+    /**
+     * 删除token
+     *
+     * @param mer_id
+     */
+    @Delete("DELETE FROM mer_login_token WHERE mer_id = #{mer_id}")
+    void deleteUserTokenByMerId(Integer mer_id);
+
+    /**
+     * 添加token
+     *
+     * @param token
+     * @return
+     */
+    @Insert("INSERT INTO mer_login_token (access_id, mer_id, login_time, last_action_time, expire_time) " +
+            "VALUES(#{access_id},#{mer_id},#{login_time},#{last_action_time},#{expire_time}) ")
+    int addLoginToken(LoginToken token);
+<<<<<<< .mine
+
+    /**
+     *@描述
+     *@参数  
+     *@返回值  
+     *@创建人  胡丛
+     *@创建时间  2018/9/10
+     *@修改人和其它信息
+     */
+    int register(User user);
+=======
+
+    /**
+     * 添加登录日志
+     *
+     * @param loginLog
+     */
+    @Insert("INSERT INTO mer_login_log (log_id, mer_id, mer_mobile, login_time, login_ip, login_area_code,longitude,latitude) " +
+            "VALUES (#{log_id},#{mer_id},#{mer_mobile},#{login_time},#{login_ip},#{login_area_code},#{longitude},#{latitude})")
+    void addLoginLog(LoginLog loginLog);
+>>>>>>> .r2272
+}

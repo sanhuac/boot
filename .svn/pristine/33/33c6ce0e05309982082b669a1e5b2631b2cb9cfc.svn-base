@@ -1,0 +1,97 @@
+package com.byc.merchants.merchants_cms.controller.user;
+
+import com.byc.merchants.merchants_cms.bean.User;
+import com.byc.merchants.merchants_cms.controller.BaseController;
+import com.byc.merchants.merchants_cms.model.UserModel;
+import com.byc.merchants.merchants_cms.result.JsonResult;
+import com.byc.merchants.merchants_cms.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/5 10:48
+ * @Description:
+ */
+@RestController
+@RequestMapping("/user")
+@Api(value = "商户接口", tags = {"商户接口"})
+@Slf4j
+@PropertySource({"classpath:config/my.properties", "classpath:config/config.properties"})
+public class UserController extends BaseController {
+
+    @Autowired
+    private UserService userService;
+
+    @Value("${my.application_name}")
+    private String application_name;
+
+    @Value("${config.deskey}")
+    private String deskey;
+
+    // 创建线程安全的Map
+    static Map<Integer, User> users = Collections.synchronizedMap(new HashMap<Integer, User>());
+
+    /**
+     * @描述 获取用户
+     * @参数 商户id
+     * @返回值 ResponseEntity
+     * @创建人 胡丛
+     * @创建时间 2018/9/5
+     * @修改人和其它信息
+     */
+    @ApiOperation(value = "获取商户信息", notes = "根据url的merchants_id来获取用户详细信息")
+    @ApiImplicitParam(name = "id", value = "商户ID", required = true, dataType = "Integer", paramType = "path")
+    @RequestMapping(value = "/getUser/{id}", method = RequestMethod.GET)
+    public ResponseEntity<JsonResult> getUser(@PathVariable("id") Integer m_id) {
+        log.info("商户id:" + m_id);
+        JsonResult r = new JsonResult();
+        try {
+            UserModel userModel = userService.selectUserById(m_id);
+            r.setResult(userModel);
+            r.setStatus("ok");
+        } catch (Exception e) {
+            r.setResult(e.getClass().getName() + ":" + e.getMessage());
+            r.setStatus("error");
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok(r);
+    }
+
+    /**
+     * 登录
+     *
+     * @param request
+     * @param mer_mobile
+     * @param password
+     * @return
+     */
+    @ApiOperation(value = "商户登录",notes = "登录操作")
+    @PostMapping("/login")
+    public ResponseEntity<JsonResult> login(HttpServletRequest request, String mer_mobile, String password) {
+        log.info("登录请求参数:mer_mobile = " + mer_mobile);
+        JsonResult result = new JsonResult();
+        try {
+            Map<String,Object> resultMap = userService.login(mer_mobile,password);
+            log.info("登录响应参数:" + resultMap);
+            result = dealSuccess(resultMap);
+        } catch (Exception e) {
+            result = dealException(e);
+        }
+        return ResponseEntity.ok(result);
+    }
+
+
+}

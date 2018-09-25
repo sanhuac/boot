@@ -1,0 +1,22 @@
+package com.byc.merchants.merchants_cms.service.car;
+
+import com.byc.merchants.merchants_cms.model.car.CarInfoModel;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/12 17:14
+ * @Description: 车辆信息接口
+ */
+public interface CarInfoService {
+
+
+    /**
+     *@描述 初步保存车辆信息
+     *@参数 CarInfoModel
+     *@返回值 int
+     *@创建人  胡丛
+     *@创建时间  2018/9/12
+     *@修改人和其它信息
+     */
+    int firstSaveCarInfo(CarInfoModel model);
+}

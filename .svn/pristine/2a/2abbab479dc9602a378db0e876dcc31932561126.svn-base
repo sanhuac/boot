@@ -1,0 +1,78 @@
+package com.byc.merchants.merchants_cms.controller;
+
+import com.byc.merchants.merchants_cms.config.PropertiesConfig;
+import com.byc.merchants.merchants_cms.exception.UnifiedException;
+import com.byc.merchants.merchants_cms.result.JsonResult;
+import com.byc.merchants.merchants_cms.util.ValidatorUtils;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.security.auth.login.Configuration;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/5 10:47
+ * @Description:
+ */
+@Slf4j
+public class BaseController {
+
+    /**
+     * 处理成功
+     *
+     * @param parmas
+     * @return
+     */
+    protected static JsonResult dealSuccess(Object parmas) {
+        JsonResult result = new JsonResult();
+        result.setResult(parmas);
+        result.setStatus("100000");
+        result.setMsg(PropertiesConfig.getProperties("message.properties", "100000"));
+        return result;
+    }
+
+    /**
+     * 重载
+     *
+     * @return
+     */
+    protected static JsonResult dealSuccess() {
+        JsonResult result = new JsonResult();
+        result.setResult("");
+        result.setStatus("100000");
+        result.setMsg(PropertiesConfig.getProperties("message.properties", "100000"));
+        return result;
+    }
+
+    /**
+     * 处理异常
+     *
+     * @param e
+     * @return
+     */
+    protected static JsonResult dealException(Exception e) {
+        JsonResult result = new JsonResult();
+        result.setResult("");
+        e.printStackTrace();
+        if (e instanceof UnifiedException) {
+            String message = e.getMessage();
+            if (ValidatorUtils.isNotNull(message)) {
+                String msg = PropertiesConfig.getProperties("message.properties", message);
+                result.setStatus(message);
+                result.setMsg(msg);
+            }
+
+            log.info("UnifiedException.....  " + message + "," + result.getMsg());
+        } else if (e instanceof RuntimeException) {
+            result.setStatus("100001");
+            result.setMsg(PropertiesConfig.getProperties("message.properties", result.getStatus()));
+            log.info("RuntimeException..... " + result.getStatus() + ", " + result.getMsg());
+        } else if (e instanceof Exception) {
+            result.setStatus("100002");
+            result.setMsg(PropertiesConfig.getProperties("message.properties", result.getStatus()));
+            log.info("Exception..... " + result.getStatus() + ", " + result.getMsg());
+        }
+        return result;
+    }
+
+
+}

@@ -1,0 +1,11 @@
+config.deskey=123456
+
+#*******************∂Ã–≈—È÷§¬Î≈‰÷√****************************************************************************************************************
+REST_URL=app.cloopen.com
+SMS_PORT=8883
+ACCOUNT_SID=8a216da85a7d6742015a8cbb7abe081b
+AUTH_TOKEN=699f6adca6c14027b3fa378acc076a3d
+APP_ID=8a216da85a7d6742015a8cbb7cac0822
+SEND_TIME=1
+TODAY_NUM_MAX=10
+

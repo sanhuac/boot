@@ -1,0 +1,29 @@
+package com.byc.merchants.merchants_cms.model;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import java.io.Serializable;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/5 12:33
+ * @Description: 商户模板
+ */
+@Data
+@ApiModel(value = "商户信息",description = "商户注册所需要的参数")
+public class UserModel implements Serializable {
+
+    /**
+     * 主键id
+     */
+    @ApiModelProperty(value = "主键")
+    private Integer id;
+
+    /**
+     * 商户用户名字
+     */
+    @ApiModelProperty(value = "商户姓名")
+    private String mer_name;
+}

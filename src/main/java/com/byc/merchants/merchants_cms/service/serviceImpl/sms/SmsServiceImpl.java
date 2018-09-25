@@ -1,0 +1,95 @@
+package com.byc.merchants.merchants_cms.service.serviceImpl.sms;
+
+import com.byc.merchants.merchants_cms.bean.sms.Sms;
+import com.byc.merchants.merchants_cms.constant.MessageConstant;
+import com.byc.merchants.merchants_cms.constant.SmsConstant;
+import com.byc.merchants.merchants_cms.dao.user.UserMapper;
+import com.byc.merchants.merchants_cms.dao.sms.SmsMapper;
+import com.byc.merchants.merchants_cms.enums.SmsEnum;
+import com.byc.merchants.merchants_cms.exception.UnifiedException;
+import com.byc.merchants.merchants_cms.message.SmsUtil;
+import com.byc.merchants.merchants_cms.service.sms.SmsService;
+import com.byc.merchants.merchants_cms.util.TimeUtils;
+import com.byc.merchants.merchants_cms.util.ValidatorUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/7 11:43
+ * @Description: 短信服务业务
+ */
+@Service("smsService")
+public class SmsServiceImpl implements SmsService {
+
+    @Autowired
+    private SmsMapper smsDao;
+
+    @Autowired
+    private UserMapper merDao;
+
+    /**
+     * 获取验证码
+     *
+     * @param user_mobile
+     * @param type
+     * @author hucong
+     */
+    @Override
+    public void send(String user_mobile, String type) throws UnifiedException {
+        //获取参数 用户手机号  验证码类型
+        String code = (int) ((Math.random() * 9 + 1) * 1000) + "";
+
+        //校验手机号格式和非空
+        if (ValidatorUtils.isEmpty(user_mobile)) {
+            throw new UnifiedException(200004);
+        }
+        if (!ValidatorUtils.isLoginMobile(user_mobile)) {
+            throw new UnifiedException(200001);
+        }
+
+        Integer sms_type = 0;
+        String type_code = "";//短信验证码发送类型编码
+        if (type.equals(SmsEnum.CODE_REGISTER + "")) {
+            //注册的话先判断用户是否存在
+            int i = merDao.selectNumByMobile(user_mobile);
+            if (i > 0) {
+                throw new UnifiedException(200005);
+            }
+            sms_type = 0;//注册验证码
+            type_code = SmsEnum.CODE_REGISTER.getCode();
+        } else if (type.equals(SmsEnum.CODE_FORGET_PASSWORD + "")) {
+            sms_type = 1;//修改密码
+            type_code = SmsEnum.CODE_FORGET_PASSWORD.getCode();
+        } else {
+            sms_type = 2;//验证码
+            type_code = SmsEnum.CODE_VALIDCODE.getCode();
+        }
+
+        //生成传参对象
+        Sms coder = new Sms();
+        coder.setUserMobile(user_mobile);
+        coder.setSmsCode(code);
+        coder.setSmsType(sms_type);
+        coder.setSendNums(1);
+        coder.setCreateTime(TimeUtils.getTimeStampByDate(TimeUtils.getSysdateTimeStart(), TimeUtils.yyyyMMddHHmmss));
+        coder.setExpireTime(TimeUtils.getTimeStampByDate(TimeUtils.getSysdateTimeStart(), TimeUtils.yyyyMMddHHmmss) + 60);
+
+        //判定当日是否超过次数限制
+        Integer sendNum = smsDao.sendNumToday(coder);
+        if (sendNum != null) {
+            if (sendNum > SmsConstant.TODAY_NUM_MAX) {
+                throw new UnifiedException(200006);
+            }
+        }
+
+        //短信消息不存在，新增发送记录
+        int insert = smsDao.insert(coder);
+        int smsId = coder.getSmsId();
+        //更新验证码
+        if (SmsUtil.send(user_mobile, type_code, new String[]{code, ""}, MessageConstant.SMS_SEND_TYPE_CODE)) {
+            smsDao.updateSendTime(smsId);
+        }
+
+    }
+}

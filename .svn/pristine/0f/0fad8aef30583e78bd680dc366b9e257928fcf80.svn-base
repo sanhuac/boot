@@ -1,0 +1,33 @@
+package com.byc.merchants.merchants_cms.service.serviceImpl;
+
+import com.byc.merchants.merchants_cms.dao.UserMapper;
+import com.byc.merchants.merchants_cms.model.UserModel;
+import com.byc.merchants.merchants_cms.service.UserService;
+import io.swagger.annotations.ApiModel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/5 12:23
+ * @Description: 商户业务层
+ */
+@Service("userService")
+public class UserServiceImpl implements UserService{
+
+    @Autowired
+    private UserMapper userDao;
+
+    /**
+     *@描述 根据商户id查询商户
+     *@参数  mer_id
+     *@返回值  UserModel
+     *@创建人  胡丛
+     *@创建时间  2018/9/5
+     *@修改人和其它信息
+     */
+   public UserModel selectUserById(Integer mer_id){
+       UserModel userModel = userDao.selectUserById(mer_id);
+       return userModel;
+   }
+}

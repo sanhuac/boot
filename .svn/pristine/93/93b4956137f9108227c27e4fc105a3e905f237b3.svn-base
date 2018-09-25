@@ -1,0 +1,115 @@
+package com.byc.merchants.merchants_cms.dao.store;
+
+import com.byc.merchants.merchants_cms.model.image.StoreImageModel;
+import com.byc.merchants.merchants_cms.model.user.UpdateMerModel;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Update;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/11 09:18
+ * @Description:
+ */
+public interface StoreMapper {
+
+    /**
+     *@描述 修改商铺logo
+     *@参数  mer_id
+     *@返回值  int
+     *@创建人  胡丛
+     *@创建时间  2018/9/11
+     *@修改人和其它信息
+     */
+    @Update("update mer_store set store_logo = #{store_logo} where mer_id = #{mer_id}")
+    int updateStoreLogo(UpdateMerModel mer);
+
+    /**
+     *@描述 修改商铺名字
+     *@参数  mer_id
+     *@返回值  int
+     *@创建人  胡丛
+     *@创建时间  2018/9/11
+     *@修改人和其它信息
+     */
+    @Update("update mer_store set store_name = #{store_name} where mer_id = #{mer_id}")
+    int updateStoreName(UpdateMerModel mer);
+
+    /**
+     *@描述 修改商铺门店简介
+     *@参数  mer_id
+     *@返回值  int
+     *@创建人  胡丛
+     *@创建时间  2018/9/11
+     *@修改人和其它信息
+     */
+    @Update("update mer_store set store_introduction = #{store_introduction} where mer_id = #{mer_id}")
+    int updateStoreIntroduce(UpdateMerModel mer);
+
+    /**
+     *@描述 修改商铺客服电话
+     *@参数  mer_id
+     *@返回值  int
+     *@创建人  胡丛
+     *@创建时间  2018/9/11
+     *@修改人和其它信息
+     */
+    @Update("update mer_store set customer_photo = #{customer_photo} where mer_id = #{mer_id}")
+    int updateStorePhone(UpdateMerModel mer);
+
+    /**
+     *@描述 修改商铺门店地址
+     *@参数  mer_id
+     *@返回值  int
+     *@创建人  胡丛
+     *@创建时间  2018/9/11
+     *@修改人和其它信息
+     */
+    @Update("update mer_store set province_code = #{province_code},city_code = #{city_code},area_code = #{area_code},store_address = #{store_address},lat = #{lat},lng = #{lng} where mer_id = #{mer_id}")
+    int updateStoreAddress(UpdateMerModel mer);
+
+    /**
+     *@描述 修改商铺门店销售品牌
+     *@参数  mer_id
+     *@返回值  int
+     *@创建人  胡丛
+     *@创建时间  2018/9/11
+     *@修改人和其它信息
+     */
+    @Update("update mer_store set sale_brands = #{sale_brands} where mer_id = #{mer_id}")
+    int updateStoreBrand(UpdateMerModel mer);
+
+    /**
+     *@描述 修改商铺门店活动
+     *@参数  mer_id
+     *@返回值  int
+     *@创建人  胡丛
+     *@创建时间  2018/9/11
+     *@修改人和其它信息
+     */
+    @Update("update mer_store set notice_label = #{notice_label},favor_label = #{favor_label} where mer_id = #{mer_id}")
+    int updateStoreActive(UpdateMerModel mer);
+
+    /**
+     *@描述 修改商铺门店二维码
+     *@参数  mer_id
+     *@返回值  int
+     *@创建人  胡丛
+     *@创建时间  2018/9/11
+     *@修改人和其它信息
+     */
+    @Update("update mer_store set store_ercode = #{store_ercode} where mer_id = #{mer_id}")
+    int updateStoreErcode(UpdateMerModel mer);
+
+    /**
+     *@描述 修改商铺门店首页图
+     *@参数  mer_id
+     *@返回值  int
+     *@创建人  胡丛
+     *@创建时间  2018/9/11
+     *@修改人和其它信息
+     */
+    @Insert("insert into mer_store_image(mer_id,image_type,image_url,create_time,start_time,end_time)values(#{mer_id},#{image_type},#{image_url},UNIX_TIMESTAMP(),#{start_time},#{end_time})")
+    int updateStoreIndex(StoreImageModel image);
+
+
+}

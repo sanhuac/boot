@@ -1,0 +1,181 @@
+package com.byc.merchants.merchants_cms.service.serviceImpl.product;
+
+/**
+ * created by pht on 2018/9/18 0018
+ */
+
+import com.byc.merchants.merchants_cms.bean.product.CarImage;
+import com.byc.merchants.merchants_cms.bean.product.CarInfo;
+import com.byc.merchants.merchants_cms.bean.product.MerCarPlan;
+import com.byc.merchants.merchants_cms.dao.car.CarInfoMapper;
+import com.byc.merchants.merchants_cms.dao.product.ProductMapper;
+import com.byc.merchants.merchants_cms.exception.UnifiedException;
+import com.byc.merchants.merchants_cms.model.car.CarImageModel;
+import com.byc.merchants.merchants_cms.model.car.CarInfoModel;
+import com.byc.merchants.merchants_cms.qo.CarQueryObject;
+import com.byc.merchants.merchants_cms.qo.PageResult;
+import com.byc.merchants.merchants_cms.service.product.ProductService;
+import com.byc.merchants.merchants_cms.util.ValidatorUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author pht
+ * @program merchants_cms
+ * @date 2018/9/18 0018
+ */
+
+@Service
+public class ProductServiceImpl implements ProductService {
+
+
+    @Autowired
+    private ProductMapper productMapper;
+
+    /**
+     * 4s店铺产品列表
+     *
+     * @param mer_id
+     * @param qo
+     * @return
+     */
+    @Override
+    public Map<String, Object> merCarList(Integer mer_id, CarQueryObject qo) throws UnifiedException {
+        //不必要的校验
+        if (ValidatorUtils.isNull(mer_id)) {
+            throw new UnifiedException(200014);
+        }
+        //查询总数
+        int count = productMapper.queryForCount(mer_id, qo);
+        PageResult pageResult = PageResult.emptyResult();
+        if (count > 0) {
+            List<CarInfo> list = productMapper.queryForList(mer_id, qo);
+            pageResult = new PageResult(qo.getCurrentPage(), qo.getPageSize(), count, list);
+        }
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("mer_4S", pageResult);
+        //查询列表
+        return resultMap;
+    }
+
+    /**
+     * 商品编辑页面数据回显
+     *
+     * @param mer_id
+     * @param car_id
+     * @return
+     */
+    @Override
+    public Map<String, Object> productEdit(Integer mer_id, Integer car_id) throws UnifiedException {
+        if (ValidatorUtils.isNull(mer_id)) {
+            throw new UnifiedException(200014);
+        }
+        Map<String, Object> resultMap = new HashMap<>();
+        if (ValidatorUtils.isNotNull(car_id)) {
+            //查询信息
+            CarInfoModel carInfo = productMapper.selectCarInfoByCarId(car_id);
+            if (ValidatorUtils.isNull(carInfo)) {
+                throw new UnifiedException(230001);
+            }
+
+            //查询车辆图片
+            List<CarImage> imageList = productMapper.selectProductImage(car_id);
+            Map<String, Object> map = new HashMap<>();
+            //查询实拍
+            if (ValidatorUtils.isNotNull(carInfo.getCar_film_id())) {
+                map.put("car_film", productMapper.selectCarFilm(carInfo.getCar_film_id()));
+            }
+            //查询分期列表
+            List<MerCarPlan> merCarPlans = productMapper.selectPlanList(car_id);
+            map.put("plans", merCarPlans);
+            map.put("info", carInfo);
+            map.put("image", imageList);
+            resultMap.put("car_info", map);
+        }
+        return resultMap;
+    }
+
+    /**
+     * 产品上下架
+     *
+     * @param mer_id
+     * @param product_id
+     */
+    @Override
+    public void saleOrNot(Integer mer_id, Integer product_id) throws UnifiedException {
+        if (ValidatorUtils.isNull(mer_id)) {
+            throw new UnifiedException(200014);
+        }
+
+        // TODO: 2018/9/18 0018 之后洗车店出来以后还是要判断类型来决定改什么产品的
+        if (ValidatorUtils.isNull(product_id)) {
+            throw new UnifiedException(230001);
+        }
+
+        int count = productMapper.saleOrNot(product_id);
+        if (count != 1) {
+            throw new UnifiedException(230002);
+        }
+
+
+    }
+
+    /**
+     * 批量删除商品
+     *
+     * @param mer_id
+     * @param ids
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchDelete(Integer mer_id, int[] ids) throws UnifiedException {
+        if (ValidatorUtils.isNull(mer_id)) {
+            throw new UnifiedException(200014);
+        }
+        if (ValidatorUtils.isNull(ids) || ids.length <= 0) {
+            throw new UnifiedException(230003);
+        }
+
+
+        for (int id : ids) {
+
+            /**
+             * 删除分期方案表
+             */
+            int p = productMapper.deleteCarPlanByCarId(id);
+            if (p != 1) {
+                throw new UnifiedException(230004);
+            }
+            /**
+             * 删除图片表
+             */
+            int i = productMapper.deleteCarImageByCarId(id);
+            if (i != 1) {
+                throw new UnifiedException(230004);
+            }
+
+            /**
+             * 删除实拍
+             */
+            int f = productMapper.deleteCarFilmByCarId(id);
+            if (i != 1) {
+                throw new UnifiedException(230004);
+            }
+
+            /**
+             * 删除车辆
+             */
+            int count = productMapper.deleteProduct(id);
+            if (count != 1) {
+                throw new UnifiedException(230004);
+            }
+        }
+
+
+    }
+}

@@ -1,0 +1,132 @@
+package com.byc.merchants.merchants_cms.service.serviceImpl.index;
+
+/**
+ * created by pht on 2018/9/17 0017
+ */
+
+import com.byc.merchants.merchants_cms.bean.apply.MerApply;
+import com.byc.merchants.merchants_cms.bean.apply.MerEarnest;
+import com.byc.merchants.merchants_cms.bean.apply.MerInsuranceApply;
+import com.byc.merchants.merchants_cms.bean.store.BrowHistory;
+import com.byc.merchants.merchants_cms.bean.store.MerAccount;
+import com.byc.merchants.merchants_cms.dao.apply.ApplyMapper;
+import com.byc.merchants.merchants_cms.dao.apply.InsuranceMapper;
+import com.byc.merchants.merchants_cms.dao.store.AccountMapper;
+import com.byc.merchants.merchants_cms.dao.store.StoreMapper;
+import com.byc.merchants.merchants_cms.dao.user.UserMapper;
+import com.byc.merchants.merchants_cms.enums.MerTypeEnum;
+import com.byc.merchants.merchants_cms.exception.UnifiedException;
+import com.byc.merchants.merchants_cms.model.register.MerchantsIn;
+import com.byc.merchants.merchants_cms.service.index.IndexService;
+import com.byc.merchants.merchants_cms.util.TimeUtils;
+import com.byc.merchants.merchants_cms.util.ValidatorUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 首页相关
+ *
+ * @author pht
+ * @program merchants_cms
+ * @date 2018/9/17 0017
+ */
+@Service
+public class IndexServiceImpl implements IndexService {
+
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private StoreMapper storeMapper;
+    @Autowired
+    private InsuranceMapper insuranceMapper;
+    @Autowired
+    private AccountMapper accountMapper;
+    @Autowired
+    private ApplyMapper applyMapper;
+
+    /**
+     * 首页
+     *
+     * @param mer_id
+     * @return
+     */
+    @Override
+    public Map<String, Object> merIndex(Integer mer_id) throws UnifiedException {
+        //校验
+        if (ValidatorUtils.isNull(mer_id)) {
+            throw new UnifiedException(200014);
+        }
+        //查询商户信息
+        MerchantsIn mer = userMapper.selectMerById(mer_id);
+        //判断
+        if (ValidatorUtils.isNull(mer)) {
+            throw new UnifiedException(200008);
+        }
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
+        //店铺基本信息
+        Map<String, Object> infoMap = new HashMap<>();
+        //店铺名称
+        infoMap.put("store_name", mer.getStore_name());
+        //店铺地址
+        infoMap.put("store_address", mer.getStore_address());
+        //店铺logo
+        infoMap.put("store_logo", mer.getStore_logo());
+        //关注人数
+        int count = storeMapper.selectFollowNum(mer_id);
+        infoMap.put("follow_num", count);
+
+        map.put("mer_info", infoMap);
+        long currentTime = TimeUtils.getCurrentTimeStamp();
+        int startTime = Integer.parseInt(TimeUtils.getDayTimeBegin(currentTime) / 1000 + "");
+        int endTime = Integer.parseInt(TimeUtils.getDayTimeEnd(currentTime) / 1000 + "");
+        //判断店铺类型,设置参数
+        Integer store_type = mer.getStore_type();
+        if (MerTypeEnum.MER_4S.KEY == store_type) {
+            //4s店主页
+            //我的钱包
+            MerAccount merAccount = accountMapper.selectAccountByMerId(mer_id);
+            //今日收入
+            Double todayIncome = applyMapper.selectTotalCount(mer_id, startTime, endTime);
+            merAccount.setToday_income(todayIncome);
+            resultMap.put("mer_account", merAccount);
+            //今日预约列表
+            List<MerApply> applyList = applyMapper.selectTotalApply(mer_id, startTime, endTime);
+            //今日定金列表
+            List<MerEarnest> earnestList = applyMapper.selectTotalEarnest(mer_id, startTime, endTime);
+            resultMap.put("today_apply", applyList);
+            resultMap.put("today_earnest", earnestList);
+            map.put("mer_4S", resultMap);
+        } else if (MerTypeEnum.MER_SECOND.KEY == store_type) {
+            //二手车行
+        } else if (MerTypeEnum.MER_INSURANCE.KEY == store_type) {
+            //保险店铺
+            //预约相关
+            //总预约人数
+            int totalCount = insuranceMapper.totalCount(mer_id);
+            //今日预约人数
+            //获取当天开始结束时间
+            int todayCount = insuranceMapper.todayCount(mer_id, startTime, endTime);
+            resultMap.put("total_count", totalCount);
+            resultMap.put("today_count", todayCount);
+            //查询预约列表
+            List<MerInsuranceApply> applyList = insuranceMapper.todayList(mer_id, startTime, endTime);
+            resultMap.put("today_List", applyList);
+            map.put("mer_insurance", resultMap);
+
+        } else if (MerTypeEnum.MER_MORTGAGE.KEY == store_type) {
+            //按揭店铺
+        }
+
+        /**
+         * 浏览记录
+         */
+        List<BrowHistory> historyList = storeMapper.selectBrowHistory(mer_id);
+        map.put("history_list", historyList);
+        return map;
+    }
+}

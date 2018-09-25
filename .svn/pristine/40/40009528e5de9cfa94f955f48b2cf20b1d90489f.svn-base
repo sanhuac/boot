@@ -1,0 +1,38 @@
+package com.byc.merchants.merchants_cms.model.pay;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/11 13:53
+ * @Description:
+ */
+@ApiModel(value = "添加支付定金日志所需参数",description = "添加支付定金日志所需参数")
+@Data
+public class DepositLogModel implements Serializable{
+
+    /**
+     * 商户id
+     */
+    @ApiModelProperty(value = "商户id（不用传）",name = "mer_id",example = "0")
+    private Integer mer_id;
+
+    /**
+     * 支付方式[0:支付宝  1:微信]
+     */
+    @ApiModelProperty(value = "支付方式[0:支付宝  1:微信]",name = "pay_type",example = "0")
+    private Integer pay_type;
+
+    /**
+     * 支付金额
+     */
+    @ApiModelProperty(value = "支付金额",name = "pay_money",example = "1680.00")
+    private BigDecimal pay_money;
+
+
+}

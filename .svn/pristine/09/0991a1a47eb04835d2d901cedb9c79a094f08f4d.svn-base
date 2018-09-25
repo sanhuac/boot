@@ -1,0 +1,220 @@
+package com.byc.merchants.merchants_cms.bean.apply;/**
+ * created by pht on 2018/9/17 0017
+ */
+
+import java.io.Serializable;
+
+/**
+ * @author pht
+ * @program merchants_cms
+ * @date 2018/9/17 0017
+ */
+public class MerEarnest implements Serializable {
+
+    private static final long serialVersionUID = -2198964192680030397L;
+    //'定金购车订单id',
+    private Integer order_id;
+    //'车辆id',
+    private Integer car_id;
+    //优惠券id
+    private Integer coupon_id;
+    //车辆名称
+    private String car_name;
+    //车辆颜色
+    private String car_color;
+    //车辆图片
+    private String index_image;
+    //'订单编号',
+    private String apply_no;
+    //'申请用户id',
+    private Integer user_id;
+    //'申请人姓名',
+    private String user_name;
+    //'用户手机号',
+    private String user_moblie;
+    ////'定金',
+    private Double earnest_amount;
+    //'支付类型(0:微信支付,1:支付宝支付,2:银行卡支付,其他方式待定)',
+    private Integer pay_type;
+    //'支付状态(0:未支付,1:支付中,2:支付成功,3:支付失败,4:支付结果确认中)',
+    private Integer pay_status;
+    // '申请提交时间',
+    private Integer apply_time;
+    //  '支付成功时间',
+    private Integer pay_time;
+    // '最初创建时间',
+    private Integer origin_time;
+    //'订单失效过期时间',
+    private Integer expire_time;
+    //'使用状态:[0:未使用 1:已作废 2:已过期 3:已使用](预留)',
+    private Integer use_status;
+
+
+    public Integer getCoupon_id() {
+        return coupon_id;
+    }
+
+    public void setCoupon_id(Integer coupon_id) {
+        this.coupon_id = coupon_id;
+    }
+
+    public Integer getOrder_id() {
+        return order_id;
+    }
+
+    public void setOrder_id(Integer order_id) {
+        this.order_id = order_id;
+    }
+
+    public Integer getCar_id() {
+        return car_id;
+    }
+
+    public void setCar_id(Integer car_id) {
+        this.car_id = car_id;
+    }
+
+    public String getCar_name() {
+        return car_name;
+    }
+
+    public void setCar_name(String car_name) {
+        this.car_name = car_name;
+    }
+
+    public String getCar_color() {
+        return car_color;
+    }
+
+    public void setCar_color(String car_color) {
+        this.car_color = car_color;
+    }
+
+    public String getIndex_image() {
+        return index_image;
+    }
+
+    public void setIndex_image(String index_image) {
+        this.index_image = index_image;
+    }
+
+    public String getApply_no() {
+        return apply_no;
+    }
+
+    public void setApply_no(String apply_no) {
+        this.apply_no = apply_no;
+    }
+
+    public Integer getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(Integer user_id) {
+        this.user_id = user_id;
+    }
+
+    public String getUser_name() {
+        return user_name;
+    }
+
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
+    }
+
+    public String getUser_moblie() {
+        return user_moblie;
+    }
+
+    public void setUser_moblie(String user_moblie) {
+        this.user_moblie = user_moblie;
+    }
+
+    public Double getEarnest_amount() {
+        return earnest_amount;
+    }
+
+    public void setEarnest_amount(Double earnest_amount) {
+        this.earnest_amount = earnest_amount;
+    }
+
+    public Integer getPay_type() {
+        return pay_type;
+    }
+
+    public void setPay_type(Integer pay_type) {
+        this.pay_type = pay_type;
+    }
+
+    public Integer getPay_status() {
+        return pay_status;
+    }
+
+    public void setPay_status(Integer pay_status) {
+        this.pay_status = pay_status;
+    }
+
+    public Integer getApply_time() {
+        return apply_time;
+    }
+
+    public void setApply_time(Integer apply_time) {
+        this.apply_time = apply_time;
+    }
+
+    public Integer getPay_time() {
+        return pay_time;
+    }
+
+    public void setPay_time(Integer pay_time) {
+        this.pay_time = pay_time;
+    }
+
+    public Integer getOrigin_time() {
+        return origin_time;
+    }
+
+    public void setOrigin_time(Integer origin_time) {
+        this.origin_time = origin_time;
+    }
+
+    public Integer getExpire_time() {
+        return expire_time;
+    }
+
+    public void setExpire_time(Integer expire_time) {
+        this.expire_time = expire_time;
+    }
+
+    public Integer getUse_status() {
+        return use_status;
+    }
+
+    public void setUse_status(Integer use_status) {
+        this.use_status = use_status;
+    }
+
+    @Override
+    public String toString() {
+        return "MerEarnest{" +
+                "order_id=" + order_id +
+                ", car_id=" + car_id +
+                ", coupon_id=" + coupon_id +
+                ", car_name='" + car_name + '\'' +
+                ", car_color='" + car_color + '\'' +
+                ", index_image='" + index_image + '\'' +
+                ", apply_no='" + apply_no + '\'' +
+                ", user_id=" + user_id +
+                ", user_name='" + user_name + '\'' +
+                ", user_moblie='" + user_moblie + '\'' +
+                ", earnest_amount=" + earnest_amount +
+                ", pay_type=" + pay_type +
+                ", pay_status=" + pay_status +
+                ", apply_time=" + apply_time +
+                ", pay_time=" + pay_time +
+                ", origin_time=" + origin_time +
+                ", expire_time=" + expire_time +
+                ", use_status=" + use_status +
+                '}';
+    }
+}

@@ -1,0 +1,15 @@
+package com.byc.merchants.merchants_cms.dao.car;
+
+import com.byc.merchants.merchants_cms.model.car.CarFilm;
+import org.apache.ibatis.annotations.Insert;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/17 15:42
+ * @Description:
+ */
+public interface CarFilmMapper {
+
+    @Insert("insert into mer_car_film(car_id,film_title,film_content,film_image,create_time)values(#{car_id},#{film_title},#{film_content},#{film_image},UNIX_TIMESTAMP())")
+    int insert(CarFilm model);
+}

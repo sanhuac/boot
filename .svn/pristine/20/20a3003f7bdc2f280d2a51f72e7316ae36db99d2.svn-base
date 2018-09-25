@@ -1,0 +1,32 @@
+package com.byc.merchants.merchants_cms.service.serviceImpl.car;
+
+import com.byc.merchants.merchants_cms.dao.car.CarInfoMapper;
+import com.byc.merchants.merchants_cms.model.car.CarInfoModel;
+import com.byc.merchants.merchants_cms.service.car.CarInfoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * @Auther: 胡丛
+ * @Date: 2018/9/12 17:16
+ * @Description: 车辆信息业务层
+ */
+@Service("carInfoService")
+public class CarInfoServiceImpl implements CarInfoService{
+
+    @Autowired
+    private CarInfoMapper carInfoDao;
+
+    /**
+     *@描述 初步保存车辆信息
+     *@参数 CarInfoModel
+     *@返回值 int
+     *@创建人  胡丛
+     *@创建时间  2018/9/12
+     *@修改人和其它信息
+     */
+    public int firstSaveCarInfo(CarInfoModel model){
+        int i = carInfoDao.firstSave(model);
+        return i;
+    }
+}
